@@ -1,0 +1,3 @@
+.vagrant
+localenv.sh
+ansiblerepo/inventory/group_vars/*/sshkeys.yaml

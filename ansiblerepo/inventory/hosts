@@ -1,0 +1,8 @@
+[cluster_head]
+head
+
+[cluster_fe]
+fe1
+
+[cluster_compute]
+node[01:04]

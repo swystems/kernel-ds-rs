@@ -1,0 +1,15 @@
+---
+- name: "Install the clustershell package"
+  dnf:
+    name: "clustershell"
+    state: present
+
+- name: "Install the clustershell config file"
+  copy:
+    src: local.cfg
+    dest: /etc/clustershell/groups.d/local.cfg
+
+- name: "Install the pdsh package"
+  dnf:
+    name: "pdsh"
+    state: present
