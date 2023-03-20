@@ -1,9 +1,0 @@
----
-- hosts: cluster_compute
-  roles:
-    - base
-    - ssh
-    - chrony
-    - slurm
-    - nfs-client
-    - userenvironment

@@ -1,7 +1,0 @@
-ssh_root_shosts:
- - head
- - '{{ hostvars["head"]["network_config"]["interfaces"]["eth1"]["ipv4_address"] }}'
-
-ssh_shosts_equiv:
- - head
- - '{{ hostvars["head"]["network_config"]["interfaces"]["eth1"]["ipv4_address"] }}'

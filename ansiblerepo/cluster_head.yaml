@@ -1,8 +1,0 @@
----
-- hosts: cluster_head
-  roles:
-    - base
-    - ssh
-    - chrony
-    - clusterhead
-    - slurm

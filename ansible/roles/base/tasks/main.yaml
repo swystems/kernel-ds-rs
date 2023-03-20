@@ -1,0 +1,38 @@
+---
+- name: "Install the hosts file"
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+
+- name: Update APT and install GCC compiler suite
+  ansible.builtin.apt:
+    name: build-essential
+    update_cache: yes
+  become: yes
+
+- name: Install clang
+  ansible.builtin.apt:
+    name: clang
+    update_cache: yes
+  become: yes
+
+- name: Get Rust
+  ansible.builtin.shell: |
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh
+    chmod +x rustup.sh
+    ./rustup.sh -y
+
+- name: Remove rustup script
+  ansible.builtin.file:
+    path: rustup.sh
+    state: absent
+
+- name: Download Linux Kernel 6.2.7
+  ansible.builtin.get_url:
+    url: https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.2.7.tar.xz
+    dest: /vagrant/
+
