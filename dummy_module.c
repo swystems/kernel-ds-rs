@@ -8,13 +8,13 @@ MODULE_LICENSE("GPL");
 
 static int dummy_init(void)
 {
-        pr_debug("Hi\n");
+        printk("Hi\n");
         return 0;
 }
 
 static void dummy_exit(void)
 {
-        pr_debug("Bye\n");
+        printk("Bye\n");
 }
 
 module_init(dummy_init);

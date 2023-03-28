@@ -1,4 +1,15 @@
+# Ensure that VMWare Tools recompiles kernel modules
+# when we update the linux images
+$fix_vmware_tools_script = <<SCRIPT
+sed -i.bak 's/answer AUTO_KMODS_ENABLED_ANSWER no/answer AUTO_KMODS_ENABLED_ANSWER yes/g' /etc/vmware-tools/locations
+sed -i 's/answer AUTO_KMODS_ENABLED no/answer AUTO_KMODS_ENABLED yes/g' /etc/vmware-tools/locations
+SCRIPT
+
+
 Vagrant.configure("2") do |config|
+
+  config.vm.provision "shell", inline: $fix_vmware_tools_script
+
 
   config.vm.define "node01" do |node01|
     node01.vm.box = "hashicorp/bionic64"
@@ -56,5 +67,6 @@ Vagrant.configure("2") do |config|
   config.vm.provision :ansible do |ansible|
     ansible.playbook = "ansible/all.yaml"
   end
+  
 
 end
