@@ -36,3 +36,30 @@
     url: https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.2.7.tar.xz
     dest: /vagrant/
 
+- name: Extract linux source
+  ansible.builtin.unarchive:
+    src: /vagrant/linux-6.2.7.tar.xz
+    dest: /vagrant
+    remote_src: yes
+
+- name: downgrade rust to kernel supported version
+  ansible.builtin.shell: |
+    . .cargo/env
+    cd /vagrant/linux-6.2.7
+    rustup override set $(scripts/min-tool-version.sh rustc)
+
+- name: add std library source (Rustforkernel requirement)
+  ansible.builtin.shell: |
+    . .cargo/env
+    rustup component add rust-src
+
+- name: install bindgen (Rustforkernel requirement)
+  ansible.builtin.shell: |
+    . .cargo/env
+    cd /vagrant/linux-6.2.7
+    cargo install --locked --version $(scripts/min-tool-version.sh bindgen) bindgen
+
+
+  
+  
+

@@ -1,7 +1,7 @@
 .vagrant
 localenv.sh
 ansible/inventory/group_vars/*/sshkeys.yaml
-linux-*.tar.xz
+linux-*
 
 # virtualbox related
 *VBoxHeadless-*.log
