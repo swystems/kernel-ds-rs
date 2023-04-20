@@ -2,6 +2,6 @@
 localenv.sh
 ansible/inventory/group_vars/*/sshkeys.yaml
 linux-*
-
+clang+llvm*
 # virtualbox related
 *VBoxHeadless-*.log

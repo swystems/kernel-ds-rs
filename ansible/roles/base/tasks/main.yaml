@@ -8,17 +8,28 @@
     mode: 0644
   become: yes
 
-- name: Update APT and install GCC compiler suite
+- name: Install required packages
   ansible.builtin.apt:
+    pkg:
+      - build-essential
+      - git
+      - fakeroot
+      - ncurses-dev
+      - xz-utils
+      - libssl-dev
+      - bc
+      - flex
+      - libelf-dev
+      - bison
     name: build-essential
     update_cache: yes
   become: yes
 
-- name: Install clang
-  ansible.builtin.apt:
-    name: clang
-    update_cache: yes
-  become: yes
+# - name: Install clang
+#   ansible.builtin.apt:
+#     name: clang
+#     update_cache: yes
+#   become: yes
 
 - name: Get Rust
   ansible.builtin.shell: |
