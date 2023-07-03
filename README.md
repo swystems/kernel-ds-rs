@@ -32,3 +32,6 @@ vagrant): https://www.virtualbox.org/
     - `vagrant destroy` -> kill all the machines 
 - The virtualbox GUI can be used for managing VMs
 
+## Overview, Compilation and LKM intgration guide
+
+Read `overview_Zampiello.pdf`
