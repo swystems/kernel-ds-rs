@@ -5,3 +5,4 @@ linux-*
 clang+llvm*
 # virtualbox related
 *VBoxHeadless-*.log
+.*
