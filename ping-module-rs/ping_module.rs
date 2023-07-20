@@ -2,98 +2,67 @@
 
 //! Rust echo server sample.
 
-use kernel::{
-    kasync::executor::{workqueue::Executor as WqExecutor, Executor},
-    net::{self, Ipv4Addr, SocketAddr, SocketAddrV4, UdpSocket},
-    prelude::*,
-    spawn_task,
-    sync::ArcBorrow,
-};
+use core::fmt::{Debug, Formatter};
+use kernel::error::Result;
+use kernel::net::addr::*;
+use kernel::net::socket::kasync::AsyncSocket;
+use kernel::net::socket::opts::SocketOptions;
+use kernel::net::socket::{opts, ShutdownCmd, SockType, Socket};
+use kernel::net::tcp::TcpListener;
+use kernel::net::udp::UdpSocket;
+use kernel::prelude::*;
+use kernel::{bindings, net::*};
 
 module! {
     type: RustEchoServer,
     name: "rust_echo_server",
     author: "Rust for Linux Contributors",
-    description: "Rust tcp echo sample",
     license: "GPL",
-    params: {
-        ADDRESS: ArrayParam<u8, 4> {
-            default: [127, 0, 0, 1],
-            permissions: 0,
-            description: "Example of array",
-        },
-        PORT: u16 {
-            default: 8080,
-            permissions: 0,
-            description: "The port to bind the TCP server to",
-        },
-    },
 }
 
-async fn echo_server(sock: UdpSocket) -> Result {
+struct RustEchoServer {}
+
+fn udp_sock() -> Result<RustEchoServer> {
+    let mut address = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOOPBACK, 8000));
+    let socket = UdpSocket::new()?;
+    socket.bind(address)?;
+    pr_info!("Listening!");
     let mut buf = [0u8; 1024];
-    loop {
-        pr_info!("1");
-        let (n, addr) = sock.read(&mut buf, true)?;
-        match addr {
-            SocketAddr::V4(addrv4) => {
-                pr_info!("Packet from port {} {}", addrv4.address().as_str(), addrv4.port());
-            }
-            _ => {}
+    while let Ok((len, peer)) = socket.receive(&mut buf, true) {
+        if len == 0 {
+            break;
         }
-        pr_info!("Received {} bytes", n);
-        if n == 0 {
-            pr_info!("Breaking!");
-            return Ok(());
-        }
-        pr_info!("2");
-        sock.write(&mut buf, true)?;
-        pr_info!("3");
+        pr_info!("Received {} bytes", len);
+        pr_info!("Message: {}", core::str::from_utf8(&buf[..len]).unwrap());
+        socket.send(&buf[..len], &peer)?;
     }
+    pr_info!("Flush");
+    Ok(RustEchoServer {})
 }
 
-//
-// async fn accept_loop(listener: TcpListener, executor: Arc<impl Executor>) {
-//     loop {
-//         if let Ok(stream) = listener.accept().await {
-//             let _ = spawn_task!(executor.as_arc_borrow(), echo_server(stream));
-//         }
-//     }
-// }
-//
-fn start_listener(
-    ex: ArcBorrow<'_, impl Executor + Send + Sync + 'static>,
-    ip_parts: &[u8; 4],
-    port: &u16,
-) -> Result {
-    let ip_addr: Ipv4Addr = Ipv4Addr::from(ip_parts);
-    let addr = SocketAddr::V4(SocketAddrV4::new(ip_addr, *port));
-
-    let udp_sock = UdpSocket::new(net::init_ns(), &addr)?;
-    pr_info!("Created UDP socket!");
-    spawn_task!(ex, echo_server(udp_sock)).unwrap();
-
-    //let listener = TcpListener::try_new(net::init_ns(), &addr)?;
-    //spawn_task!(ex, accept_loop(listener, ex.into()))?;
-    Ok(())
-}
-
-struct RustEchoServer {
-    //_handle: AutoStopHandle<dyn Executor>,
+fn tcp_sock() -> Result<RustEchoServer> {
+    let listener = TcpListener::new(SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOOPBACK, 8000)))?;
+    pr_info!("Listening!");
+    while let Ok(stream) = listener.accept() {
+        pr_info!("Accepted!");
+        let mut buf = [0u8; 1024];
+        while let Ok(len) = stream.receive(&mut buf) {
+            if len == 0 {
+                break;
+            }
+            pr_info!("Received {} bytes", len);
+            pr_info!("Message: {}", core::str::from_utf8(&buf[..len]).unwrap());
+            stream.send(&buf[..len])?;
+        }
+        pr_info!("Flush");
+    }
+    Ok(RustEchoServer {})
 }
 
 impl kernel::Module for RustEchoServer {
-    fn init(_name: &'static CStr, _module: &'static ThisModule) -> Result<Self> {
-        let handle = WqExecutor::try_new(kernel::workqueue::system())?;
-        let server_addr: &[u8; 4] = ADDRESS.read().try_into().unwrap();
-        let server_port: &u16 = PORT.read();
-        pr_info!("Starting server...");
-
-        //pr_crit!("Starting server on {}:{}", server_addr, server_port);
-
-        start_listener(handle.executor(), server_addr, server_port)?;
-        Ok(Self {
-            //_handle: handle.into(),
-        })
+    fn init(_module: &'static ThisModule) -> Result<Self> {
+        tcp_sock();
+        udp_sock();
+        Ok(Self {})
     }
 }
