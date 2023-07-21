@@ -1,74 +1,34 @@
-# Ensure that VMWare Tools recompiles kernel modules
-# when we update the linux images
-$fix_vmware_tools_script = <<SCRIPT
-sed -i.bak 's/answer AUTO_KMODS_ENABLED_ANSWER no/answer AUTO_KMODS_ENABLED_ANSWER yes/g' /etc/vmware-tools/locations
-sed -i 's/answer AUTO_KMODS_ENABLED no/answer AUTO_KMODS_ENABLED yes/g' /etc/vmware-tools/locations
-SCRIPT
 
 
 Vagrant.configure("2") do |config|
-
-  config.vm.provision "shell", inline: $fix_vmware_tools_script
-
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+  config.vm.box = "bento/ubuntu-22.04"
 
   config.vm.define "node01" do |node01|
-    node01.vm.box = "bento/ubuntu-22.04"
     node01.vm.hostname = "node01"
     node01.vm.network :private_network, ip: "192.168.56.101"
   end
 
   config.vm.define "node02" do |node02|
-    node02.vm.box = "bento/ubuntu-22.04"
     node02.vm.hostname = "node02"
     node02.vm.network :private_network, ip: "192.168.56.102"
   end
 
   config.vm.define "node03" do |node03|
-    node03.vm.box = "bento/ubuntu-22.04"
     node03.vm.hostname = "node03"
     node03.vm.network :private_network, ip: "192.168.56.103"
   end
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.synced_folder "~/git-repo/linux", "/linux_src"
 
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-
+  # choose one node to run install.sh
+  # ...
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.memory = 2048
-    vb.cpus = 2
+    vb.cpus = 4
   end
-
-
-  ## provisioning
-  config.vm.provision :ansible do |ansible|
-    ansible.playbook = "ansible/all.yaml"
-  end
-  
 
 end
