@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-KDIR ?= /lib/modules/`uname -r`/build
+KDIR ?= /linux_src
 
 default:
 	$(MAKE) -C $(KDIR) M=$$PWD

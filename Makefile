@@ -1,6 +1,6 @@
 obj-m = dummy_module.o
-KVERSION = $(shell uname -r)
+KDIR ?= /linux_src
 all:
-		make -C /lib/modules/$(KVERSION)/build M=$(PWD) modules
+		make -C $(KDIR) M=$(PWD) modules
 clean:
-		make -C /lib/modules/$(KVERSION)/build M=$(PWD) clean
+		make -C $(KDIR) M=$(PWD) clean
