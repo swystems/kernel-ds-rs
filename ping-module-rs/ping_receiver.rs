@@ -22,16 +22,19 @@ struct RustEchoServer {}
 impl kernel::Module for RustEchoServer {
     fn init(_module: &'static ThisModule) -> Result<Self> {
         let socket = UdpSocket::new()?;
-        socket.bind(SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOOPBACK, 8000)))?;
+        socket.bind(SocketAddr::V4(SocketAddrV4::new(
+            Ipv4Addr::from([0, 0, 0, 0]),
+            8000,
+        )))?;
         pr_info!("Listening!");
         let mut buf = [0u8; 1024];
-        while let Ok((size, peer)) = socket.receive(&mut buf, []) {
+        while let Ok((size, peer)) = socket.receive_from(&mut buf, []) {
             if size == 0 {
                 break;
             }
             pr_info!("Received {} bytes", size);
             pr_info!("Message: {}", core::str::from_utf8(&buf[..size]).unwrap());
-            let sent = socket.send(&buf[..size], &peer, [])?;
+            let sent = socket.send_to(&buf[..size], &peer, [])?;
             pr_info!("Sent back {} bytes", sent);
         }
         pr_info!("Flush");
