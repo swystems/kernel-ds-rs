@@ -5,6 +5,8 @@ KDIR = ../linux-rust/
 
 default:
 	$(MAKE) -C $(KDIR) M=$$PWD
+debug:
+	$(MAKE) -C $(KDIR) M=$$PWD EXTRA_CFLAGS="-g -DDEBUG"
 clean:
 	$(MAKE) -C $(KDIR) M=$(CURDIR) CC=$(CC) clean
 ins:

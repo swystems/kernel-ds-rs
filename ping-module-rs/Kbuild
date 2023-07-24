@@ -1,3 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
+
 ccflags-y := -Wno-declaration-after-statement -g -gdwarf
-obj-m := ping_module.o
+obj-m := ping_receiver.o
+obj-m += ping_sender.o
