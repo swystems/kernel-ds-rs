@@ -22,6 +22,7 @@ struct RustEchoServer {}
 impl kernel::Module for RustEchoServer {
     fn init(_module: &'static ThisModule) -> Result<Self> {
         let socket = UdpSocket::new()?;
+        // Listen on all interfaces on port 8000.
         socket.bind(SocketAddr::V4(SocketAddrV4::new(
             Ipv4Addr::from([0, 0, 0, 0]),
             8000,

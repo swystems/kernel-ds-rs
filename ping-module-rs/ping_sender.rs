@@ -22,8 +22,10 @@ struct RustEchoServer {}
 impl kernel::Module for RustEchoServer {
     fn init(_module: &'static ThisModule) -> Result<Self> {
         let socket = Socket::new(AddressFamily::Inet, SockType::Datagram, IpProtocol::Udp)?;
-        // connect to localhost:8000
-        let peer_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::from([192,168,56,101]), 8000));
+        // node01: 192.168.56.101.
+        // This sender is meant to be run on node02.
+        let peer_addr =
+            SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::from([192, 168, 56, 101]), 8000));
         socket.connect(&peer_addr, 0)?;
         pr_info!("Connected!");
         let mut buf = [0u8; 1024];
