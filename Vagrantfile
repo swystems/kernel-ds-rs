@@ -1,5 +1,3 @@
-
-
 Vagrant.configure("2") do |config|
   config.ssh.username = "vagrant"
   config.ssh.password = "vagrant"
@@ -22,13 +20,16 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "~/git-repo/linux", "/linux_src"
 
-  # choose one node to run install.sh
-  # ...
-
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.memory = 2048
     vb.cpus = 4
   end
+
+#config.vm.provision "shell", path: "install.sh"
+#config.vm.provision "shell", reboot: true
+#config.vm.provision "shell", inline: "uname -a"
+  config.vm.provision "shell", inline: "apt install make && cd /linux_src && make install"
+  config.vm.provision "shell", reboot: true
 
 end
