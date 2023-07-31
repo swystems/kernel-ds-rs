@@ -1,0 +1,5 @@
+#!/bin/sh
+
+busybox insmod rustdev.ko
+busybox mknod /dev/rustdev c 248 0
+/userprog /dev/rustdev 100
