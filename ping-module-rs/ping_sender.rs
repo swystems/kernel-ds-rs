@@ -6,6 +6,7 @@ use kernel::error::Result;
 use kernel::net::addr::*;
 use kernel::net::socket::{opts, SockType, Socket};
 use kernel::net::tcp::TcpListener;
+use kernel::net::ip::IpProtocol;
 use kernel::net::udp::UdpSocket;
 use kernel::net::*;
 use kernel::prelude::*;
@@ -26,14 +27,11 @@ impl kernel::Module for RustEchoServer {
         // This sender is meant to be run on node02.
         let peer_addr =
             SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::from([192, 168, 56, 101]), 8000));
-        socket.connect(&peer_addr, 0)?;
+        // socket.connect(&peer_addr, 0)?;
         pr_info!("Connected!");
         let mut buf = [0u8; 1024];
         let msg = "Hello, world!";
-        while let Ok(size) = socket.send(msg.as_bytes(), []) {
-            if size == 0 {
-                break;
-            }
+        if let Ok(size) = socket.send_to(msg.as_bytes(), &peer_addr, []) {
             pr_info!("Sent {} bytes", size);
             let size = socket.receive(&mut buf, [])?;
             pr_info!("Received {} bytes", size);
