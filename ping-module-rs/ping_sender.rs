@@ -2,12 +2,11 @@
 
 //! Rust echo server sample.
 
+use kernel::flag_set;
 use kernel::error::Result;
 use kernel::net::addr::*;
-use kernel::net::socket::{opts, SockType, Socket};
-use kernel::net::tcp::TcpListener;
+use kernel::net::socket::{SockType, Socket};
 use kernel::net::ip::IpProtocol;
-use kernel::net::udp::UdpSocket;
 use kernel::net::*;
 use kernel::prelude::*;
 
@@ -31,9 +30,9 @@ impl kernel::Module for RustEchoServer {
         pr_info!("Connected!");
         let mut buf = [0u8; 1024];
         let msg = "Hello, world!";
-        if let Ok(size) = socket.send_to(msg.as_bytes(), &peer_addr, []) {
+        if let Ok(size) = socket.send_to(msg.as_bytes(), &peer_addr, flag_set!()) {
             pr_info!("Sent {} bytes", size);
-            let size = socket.receive(&mut buf, [])?;
+            let size = socket.receive(&mut buf, flag_set!())?;
             pr_info!("Received {} bytes", size);
             pr_info!("Message: {}", core::str::from_utf8(&buf[..size]).unwrap());
         }
