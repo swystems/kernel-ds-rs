@@ -1,0 +1,4 @@
+#!/bin/sh
+
+busybox insmod rustdev.ko
+busybox time /userprog /dev/rustdev 70
