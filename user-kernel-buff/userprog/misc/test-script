@@ -1,0 +1,5 @@
+#!/bin/sh
+
+busybox insmod rustdev.ko msg_size=4194304 msg_slots=8 buf_offset=4096
+RUST_BACKTRACE=1 busybox time /userprog /dev/rustdev 4096 8 4194304 1000
+busybox cat log

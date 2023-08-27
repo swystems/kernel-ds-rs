@@ -1,0 +1,23 @@
+- call path
+  - ReadStartU
+  - ReadSyncStartK
+- read_copy
+  - ReadStartK
+  - ReadEndK
+- write_copy
+  - WriteStartK
+  - WriteStartK
+- sync for read
+  - ReadSyncStartK
+  - ReadSyncEndK
+- sync for write
+  - WriteSyncStartK
+  - WriteSyncEndK
+- aware of read completion
+  - ReadEndK
+  - WriteSyncEndK
+- aware of write completion
+  - WriteEndK
+  - ReadSyncEndK
+- two continuous timestamp in userspace
+- two continuous timestamp in kernelspace
